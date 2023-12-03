@@ -1,8 +1,13 @@
-import fs from 'fs';
+import * as fs from 'fs';
+import { Readable } from 'stream'
 
-function randomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+async function * randomNumber() {
+    for (let i = 0; i < 20; i++) {
+        yield Math.floor(Math.random() * (2137 - (-420) + 1)) + (-420);
+    }
 }
+
+const rnlist = Readable.from(randomNumber());
 
 function getTimestamp() {
     const date = new Date();
@@ -20,12 +25,10 @@ function writeToFile() {
     const file = `random-${timestamp}.txt`;
     const stream = fs.createWriteStream(file);
 
-    for (let i = 0; i < 20; i++) {
-        const randomList = randomNumber(-420, 2137);
-        stream.write(`${randomList}\n`);
-    }
+    rnlist.on('data', (chunk) => {
+        stream.write(chunk.toString()+'\n')
+    });
 
-    stream.end();
     console.log(`Wygenerowano do pliku: ${file}`);
 }
 
